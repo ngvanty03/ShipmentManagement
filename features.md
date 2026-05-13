@@ -50,3 +50,50 @@
   - Implemented `axiosInstance.ts` with `withCredentials: true` to manage HttpOnly cookies for tokens automatically.
   - Updated `authStore.ts` to match the new `User` DTO (`firstName`, `lastName`) and removed explicit token storage.
   - Refactored `useAuth.ts` hook to integrate with `POST /api/auth/login`.
+
+### Frontend (Agent-1) Update - UI Enhancements
+**Date:** 2026-05-13
+**Status:** Completed (Menu Layout & Loaders)
+
+- **Completed Tasks:**
+  - Designed and implemented role-based menu logic (Admin vs Customer items) in `MainLayout`.
+  - Added layout state to toggle between vertical (Sidebar) and horizontal (Top Navigation) menus.
+  - Developed a reusable `Spinner` component.
+  - Integrated `Spinner` into the login button to handle network latency feedback visually.
+
+### Backend (Agent-2) Update - Users API
+**Date:** 2026-05-13
+**Status:** Completed (Get Users Endpoint)
+
+- **Completed Tasks:**
+  - Added `IsActive` column to the `User` entity (default: true).
+  - Generated and applied EF Core migration `AddUserIsActive`.
+  - Implemented generic pagination with `PagedResult<T>`.
+  - Added `GET /api/users` endpoint with filtering, sorting, and pagination support.
+- **Contract:**
+  - `GET /api/users`
+    - **Query Parameters:**
+      - `email` (string, optional)
+      - `isActive` (boolean, optional)
+      - `pageNumber` (int, default: 1)
+      - `pageSize` (int, default: 10)
+      - `sortBy` (string, optional) - e.g., "email", "firstName", "lastName", "isActive"
+      - `sortDirection` (string, optional) - "asc" or "desc"
+    - **Response (200 OK):**
+      ```json
+      {
+        "items": [
+          {
+            "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            "email": "admin@example.com",
+            "firstName": "System",
+            "lastName": "Admin",
+            "isActive": true
+          }
+        ],
+        "totalCount": 1,
+        "pageNumber": 1,
+        "pageSize": 10,
+        "totalPages": 1
+      }
+      ```

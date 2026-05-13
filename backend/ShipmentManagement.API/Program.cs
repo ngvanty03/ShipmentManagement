@@ -36,6 +36,7 @@ using (var scope = app.Services.CreateScope())
             PasswordHash = "admin@123456", // Expected password
             FirstName = "System",
             LastName = "Admin",
+            IsActive = true,
             Role = Role.Admin
         });
         db.SaveChanges();

@@ -11,6 +11,8 @@ public class User
     public string LastName { get; set; } = string.Empty;
     public Role Role { get; set; }
     
+    public bool? IsActive { get; set; } = true;
+
     public string? RefreshToken { get; set; }
     public DateTime? RefreshTokenExpiryTime { get; set; }
 }
