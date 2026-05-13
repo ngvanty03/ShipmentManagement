@@ -1,6 +1,8 @@
 using ShipmentManagement.Application;
 using ShipmentManagement.Infrastructure;
+using ShipmentManagement.API.Middleware;
 using Scalar.AspNetCore;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ShipmentManagement.Domain.Entities;
 using ShipmentManagement.Domain.Enums;
@@ -25,22 +27,25 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-     /*db.Database.Migrate();
+    db.Database.Migrate();
 
     if (!db.Users.Any())
     {
-        db.Users.Add(new User
+        var passwordHasher = new PasswordHasher<User>();
+        var adminUser = new User
         {
             Id = Guid.NewGuid(),
-            Email = "admin@example.com", // Dummy admin email
-            PasswordHash = "admin@123456", // Expected password
+            Email = "admin@example.com",
             FirstName = "System",
             LastName = "Admin",
             IsActive = true,
             Role = Role.Admin
-        });
+        };
+        adminUser.PasswordHash = passwordHasher.HashPassword(adminUser, "admin@123456");
+
+        db.Users.Add(adminUser);
         db.SaveChanges();
-    }*/
+    }
 }
 
 if (app.Environment.IsDevelopment())
@@ -55,7 +60,7 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-// Global Exception Handler can be mapped here (e.g., UseExceptionHandler)
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 

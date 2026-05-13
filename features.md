@@ -97,3 +97,21 @@
         "totalPages": 1
       }
       ```
+
+### Backend (Agent-2) Update - User CRUD APIs
+**Date:** 2026-05-13
+**Status:** Completed (Create, Update, Delete, ChangePassword)
+
+- **Summary:** Implemented 4 new User management endpoints. All passwords are now hashed using `PasswordHasher<User>`. The Login handler was updated to verify hashed passwords. The seed admin user now uses a hashed password.
+- **Contract:**
+  - `POST /api/users` — Create User
+    - **Request:** `{ "email": "...", "password": "...", "firstName": "...", "lastName": "...", "isActive": true }`
+    - **Response (201 Created):** `UserDTO { id, email, firstName, lastName, isActive }`
+  - `PUT /api/users/{id}` — Update User (no password change)
+    - **Request:** `{ "email": "...", "firstName": "...", "lastName": "...", "isActive": true }`
+    - **Response (200 OK):** `UserDTO { id, email, firstName, lastName, isActive }`
+  - `DELETE /api/users/{id}` — Delete User
+    - **Response:** `204 NoContent`
+  - `PUT /api/users/{id}/change-password` — Change Password
+    - **Request:** `{ "email": "...", "password": "..." }`
+    - **Response:** `204 NoContent`
