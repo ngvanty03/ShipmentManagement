@@ -1,0 +1,6 @@
+@ShipmentManagement.API_HostAddress = http://localhost:5205
+
+GET {{ShipmentManagement.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

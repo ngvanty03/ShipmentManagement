@@ -1,0 +1,18 @@
+# --- .NET Safety ---
+[Dd]ebug/
+[Rr]elease/
+bin/
+obj/
+*.pdb
+*.log
+
+# --- React/Node Safety ---
+node_modules/
+dist/
+build/
+.npm/
+
+# --- IDE Safety ---
+.vs/
+.vscode/
+*.user
