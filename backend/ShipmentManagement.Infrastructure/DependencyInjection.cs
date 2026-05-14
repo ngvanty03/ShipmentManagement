@@ -34,19 +34,7 @@ public static class DependencyInjection
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(configuration["JwtSettings:Secret"] ?? "SuperSecretKeyMustBeVeryLongToWorkWithSha256AtLeast32Bytes"))
                 };
-                
-                // Read the token out of the cookie instead of the Authorization header
-                options.Events = new JwtBearerEvents
-                {
-                    OnMessageReceived = context =>
-                    {
-                        if (context.Request.Cookies.ContainsKey("accessToken"))
-                        {
-                            context.Token = context.Request.Cookies["accessToken"];
-                        }
-                        return Task.CompletedTask;
-                    }
-                };
+                // AccessToken is now read from the standard Authorization: Bearer header (default behavior)
             });
 
         return services;

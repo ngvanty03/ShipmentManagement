@@ -11,14 +11,15 @@ export interface User {
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
-  // Note: We don't store token here because it's delivered via HttpOnly Cookies
-  login: (user: User) => void;
+  token: string | null;
+  login: (user: User, token: string) => void;
   logout: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
-  login: (user) => set({ user, isAuthenticated: true }),
-  logout: () => set({ user: null, isAuthenticated: false }),
+  token: null,
+  login: (user, token) => set({ user, isAuthenticated: true, token }),
+  logout: () => set({ user: null, isAuthenticated: false, token: null }),
 }));

@@ -7,8 +7,16 @@ using Microsoft.EntityFrameworkCore;
 using ShipmentManagement.Domain.Entities;
 using ShipmentManagement.Domain.Enums;
 using ShipmentManagement.Infrastructure.Persistence;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Replace default logging with Serilog (configured from appsettings.json)
+builder.Host.UseSerilog((context, configuration) =>
+    configuration.ReadFrom.Configuration(context.Configuration));
+
+// Disable default logging providers
+builder.Logging.ClearProviders();
 
 // Use port 2026
 //builder.WebHost.UseUrls("http://*:2026");

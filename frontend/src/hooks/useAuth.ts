@@ -3,6 +3,10 @@ import { useAuthStore, type User } from '../stores/authStore';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
 
+interface LoginResponse extends User {
+  accessToken: string;
+}
+
 export const useAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -13,15 +17,14 @@ export const useAuth = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axiosInstance.post<User>('/auth/login', {
+      const response = await axiosInstance.post<LoginResponse>('/auth/login', {
         email,
         password,
       });
+      console.log("response.data: ", response.data);
+      //const { accessToken, ...user } = response.data;
 
-      // Response contains User details. Token is set via HttpOnly Cookie by the backend.
-      const user = response.data;
-
-      setAuthLogin(user);
+      setAuthLogin(response.data.user, response.data.accessToken);
       navigate(redirectUrl, { replace: true });
     } catch (err: any) {
       if (err.response && err.response.data && err.response.data.message) {

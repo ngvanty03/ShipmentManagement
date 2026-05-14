@@ -31,7 +31,6 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResult>
         {
             throw new UnauthorizedAccessException("Invalid credentials");
         }
-
         // Verify password using PasswordHasher<User>
         var verificationResult = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
         if (verificationResult == PasswordVerificationResult.Failed)

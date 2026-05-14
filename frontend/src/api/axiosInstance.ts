@@ -10,7 +10,19 @@ const axiosInstance = axios.create({
   },
 });
 
+import { useAuthStore } from '../stores/authStore';
+
 // Optionally add interceptors here to handle 401s (e.g., call refresh token)
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {

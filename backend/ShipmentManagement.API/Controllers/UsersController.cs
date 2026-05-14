@@ -23,7 +23,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    // [Authorize]
+    [Authorize]
     public async Task<ActionResult<PagedResult<UserDTO>>> GetUsers([FromQuery] GetUsersQuery query)
     {
         var result = await _mediator.Send(query);
@@ -31,7 +31,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost]
-    // [Authorize]
+    [Authorize]
     public async Task<ActionResult<UserDTO>> CreateUser(CreateUserRequest request)
     {
         var command = new CreateUserCommand(
@@ -47,7 +47,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    // [Authorize]
+    [Authorize]
     public async Task<ActionResult<UserDTO>> UpdateUser(Guid id, UpdateUserRequest request)
     {
         var command = new UpdateUserCommand(
@@ -63,7 +63,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    // [Authorize]
+    [Authorize]
     public async Task<IActionResult> DeleteUser(Guid id)
     {
         await _mediator.Send(new DeleteUserCommand(id));
@@ -71,7 +71,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut("{id:guid}/change-password")]
-    // [Authorize]
+    [Authorize]
     public async Task<IActionResult> ChangePassword(Guid id, ChangePasswordRequest request)
     {
         await _mediator.Send(new ChangePasswordCommand(id, request.Email, request.Password));

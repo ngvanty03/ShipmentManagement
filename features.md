@@ -115,3 +115,25 @@
   - `PUT /api/users/{id}/change-password` — Change Password
     - **Request:** `{ "email": "...", "password": "..." }`
     - **Response:** `204 NoContent`
+
+### Backend (Agent-2) Update - JWT Bearer Token & Serilog
+**Date:** 2026-05-14
+**Status:** Completed
+
+- **Summary:**
+  1. **JWT Bearer Token (hybrid):** Access token is now returned in JSON body. Frontend must store it and send via `Authorization: Bearer <token>` header. Refresh token stays in HttpOnly cookie.
+  2. **Serilog:** Configured file-only logging in `appsettings.json`. All Microsoft/System logs suppressed to Warning. Custom app logs at Information level. Logs written to `Logs/log-YYYYMMDD.txt` with 30-day retention.
+- **Breaking Contract Change (Auth):**
+  - `POST /api/auth/login`
+    - **Response (200 OK):**
+      ```json
+      {
+        "accessToken": "eyJ...",
+        "user": { "id", "email", "firstName", "lastName", "role" }
+      }
+      ```
+      *Note: `refreshToken` is still set via `Set-Cookie` header (HttpOnly).*
+  - `POST /api/auth/refresh`
+    - **Request:** No body. `refreshToken` sent via cookie automatically.
+    - **Response (200 OK):** Same shape as login. New `refreshToken` cookie is set.
+  - **Action Required from Agent-1:** Store `accessToken` from response body. Send it in `Authorization: Bearer <token>` header on all API calls. Remove `withCredentials` if it was only for the access token cookie (keep it for refresh token cookie).
