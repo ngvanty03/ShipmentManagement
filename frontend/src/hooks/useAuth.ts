@@ -1,11 +1,9 @@
 import { useState } from 'react';
-import { useAuthStore, type User } from '../stores/authStore';
+import { useAuthStore } from '../stores/authStore';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
+import type { LoginResponse } from '../dto/common';
 
-interface LoginResponse extends User {
-  accessToken: string;
-}
 
 export const useAuth = () => {
   const [isLoading, setIsLoading] = useState(false);

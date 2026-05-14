@@ -32,7 +32,8 @@ public static class DependencyInjection
                     ValidIssuer = configuration["JwtSettings:Issuer"],
                     ValidAudience = configuration["JwtSettings:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(configuration["JwtSettings:Secret"] ?? "SuperSecretKeyMustBeVeryLongToWorkWithSha256AtLeast32Bytes"))
+                        Encoding.UTF8.GetBytes(configuration["JwtSettings:Secret"] ?? "SuperSecretKeyMustBeVeryLongToWorkWithSha256AtLeast32Bytes")),
+                    ClockSkew = TimeSpan.Zero // Enforce exact token expiration (default is 5 minutes tolerance)
                 };
                 // AccessToken is now read from the standard Authorization: Bearer header (default behavior)
             });

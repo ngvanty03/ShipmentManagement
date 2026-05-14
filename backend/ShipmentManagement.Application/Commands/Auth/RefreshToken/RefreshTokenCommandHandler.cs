@@ -9,6 +9,7 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
 {
     private readonly IApplicationDbContext _context;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
+    //private readonly IConfiguration _configuration;
 
     public RefreshTokenCommandHandler(IApplicationDbContext context, IJwtTokenGenerator jwtTokenGenerator)
     {
@@ -28,15 +29,15 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
         var accessToken = _jwtTokenGenerator.GenerateAccessToken(user);
         var newRefreshToken = _jwtTokenGenerator.GenerateRefreshToken();
 
-        user.RefreshToken = newRefreshToken;
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+        user.RefreshToken = newRefreshToken.Item1;
+        user.RefreshTokenExpiryTime = newRefreshToken.Item2;
         
         await _context.SaveChangesAsync(cancellationToken);
 
         return new RefreshTokenResult
         {
             AccessToken = accessToken,
-            RefreshToken = newRefreshToken,
+            RefreshToken = user.RefreshToken,
             Profile = new UserProfileResponse
             {
                 Id = user.Id,

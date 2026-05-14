@@ -64,9 +64,9 @@ export default function UserView({ filterParam, setFilterParam, data, loading, h
                             />
                         </div>
                         <select
-                            value={localFilter.isActive === null ? '' : localFilter.isActive ? 'true' : 'false'}
+                            value={localFilter.isActive === undefined ? '' : localFilter.isActive ? 'true' : 'false'}
                             onChange={(e) => {
-                                setLocalFilter({ ...localFilter, isActive: e.target.value === '' ? null : e.target.value === 'true' })
+                                setLocalFilter({ ...localFilter, isActive: e.target.value === '' ? undefined : e.target.value === 'true' })
                             }}
                             data-testid='search-isactive'
                             className="px-4 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white"
@@ -125,23 +125,23 @@ export default function UserView({ filterParam, setFilterParam, data, loading, h
                                     <SortListHeader
                                         title="Email"
                                         field="email"
-                                        sortBy={filterParam.sortBy}
-                                        sortDirection={filterParam.sortDirection}
+                                        sortBy={filterParam.sortBy || ''}
+                                        sortDirection={filterParam.sortDirection || 'asc'}
                                         onSortChange={handleSortData}
                                     />
                                     <SortListHeader
                                         title="firstName"
                                         field="firstName"
-                                        sortBy={filterParam.sortBy}
-                                        sortDirection={filterParam.sortDirection}
+                                        sortBy={filterParam.sortBy || ''}
+                                        sortDirection={filterParam.sortDirection || 'asc'}
                                         onSortChange={handleSortData}
                                     />
                                     <SortListHeader
                                         title="Status"
                                         field="isActive"
                                         widthClassName='w-32'
-                                        sortBy={filterParam.sortBy}
-                                        sortDirection={filterParam.sortDirection}
+                                        sortBy={filterParam.sortBy || ''}
+                                        sortDirection={filterParam.sortDirection || 'asc'}
                                         onSortChange={handleSortData}
                                     />
                                     <th className="text-center px-5 py-3.5 font-semibold text-gray-600 border border-gray-300 w-32">

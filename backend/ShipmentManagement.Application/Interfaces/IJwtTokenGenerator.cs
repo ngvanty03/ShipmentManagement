@@ -5,5 +5,5 @@ namespace ShipmentManagement.Application.Interfaces;
 public interface IJwtTokenGenerator
 {
     string GenerateAccessToken(User user);
-    string GenerateRefreshToken();
+    (string,DateTime) GenerateRefreshToken();
 }
