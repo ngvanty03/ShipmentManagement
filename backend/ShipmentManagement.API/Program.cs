@@ -1,4 +1,4 @@
-using ShipmentManagement.Application;
+﻿using ShipmentManagement.Application;
 using ShipmentManagement.Infrastructure;
 using ShipmentManagement.API.Middleware;
 using Scalar.AspNetCore;
@@ -28,7 +28,19 @@ builder.Services.AddOpenApi("ShipmentManagement"); // .NET 9 default openapi gen
 // Add Clean Arch Layers
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
-
+// ── CORS ──────────────────────────────────────────────────────────────────────
+var allowedOrigins = builder.Configuration.GetSection("CorsSettings:AllowedOrigins").Get<string[]>() ?? [];
+if (allowedOrigins.Any())
+{
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowConfiguredOrigins", policy =>
+             policy.WithOrigins(allowedOrigins)
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials());
+    });
+}
 var app = builder.Build();
 
 // Auto-migrate and seed dummy data
@@ -70,15 +82,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
-// IMPORTANT: CORS policy should be configured since frontend runs on different port (Vite)
-app.UseCors(policy => policy
-    .WithOrigins("http://localhost:5173") // Adjust this to match Agent-1's Vite port
-    .AllowAnyHeader()
-    .AllowAnyMethod()
-    .AllowCredentials());
-
+if (allowedOrigins.Any())
+{
+    // IMPORTANT: CORS policy should be configured since frontend runs on different port (Vite)
+    app.UseCors("AllowConfiguredOrigins");
+}
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -1,5 +1,7 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using ShipmentManagement.Application.Commands.Auth.Login;
 using ShipmentManagement.Application.DTOs.Auth;
 using ShipmentManagement.Application.Interfaces;
 
@@ -9,16 +11,19 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
 {
     private readonly IApplicationDbContext _context;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
-    //private readonly IConfiguration _configuration;
+    private readonly ILogger<RefreshTokenCommandHandler> _logger;
 
-    public RefreshTokenCommandHandler(IApplicationDbContext context, IJwtTokenGenerator jwtTokenGenerator)
+
+    public RefreshTokenCommandHandler(IApplicationDbContext context, IJwtTokenGenerator jwtTokenGenerator, ILogger<RefreshTokenCommandHandler> logger)
     {
         _context = context;
         _jwtTokenGenerator = jwtTokenGenerator;
+        _logger= logger;
     }
 
     public async Task<RefreshTokenResult> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
+        _logger.LogInformation($"Call loggin RefreshTokenCommandHandler with RefreshToken:{request.RefreshToken}");
         var user = await _context.Users.FirstOrDefaultAsync(u => u.RefreshToken == request.RefreshToken, cancellationToken);
         
         if (user == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)

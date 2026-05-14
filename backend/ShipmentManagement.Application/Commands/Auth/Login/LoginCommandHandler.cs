@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using ShipmentManagement.Application.DTOs.Auth;
 using ShipmentManagement.Application.Interfaces;
 using DomainUser = ShipmentManagement.Domain.Entities.User;
@@ -12,19 +13,23 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResult>
     private readonly IApplicationDbContext _context;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IPasswordHasher<DomainUser> _passwordHasher;
+    private readonly ILogger<LoginCommandHandler> _logger;
 
     public LoginCommandHandler(
         IApplicationDbContext context,
         IJwtTokenGenerator jwtTokenGenerator,
-        IPasswordHasher<DomainUser> passwordHasher)
+        IPasswordHasher<DomainUser> passwordHasher,
+        ILogger<LoginCommandHandler> logger)
     {
         _context = context;
         _jwtTokenGenerator = jwtTokenGenerator;
         _passwordHasher = passwordHasher;
+        _logger = logger;
     }
 
     public async Task<LoginResult> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
+        _logger.LogInformation($"Call loggin LoginCommandHandler with email:{request.Email}");
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
         
         if (user == null)
