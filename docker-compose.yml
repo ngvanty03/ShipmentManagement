@@ -1,0 +1,22 @@
+services:
+  # 1. Your ASP.NET Core 9 + React App
+  shipment-management-service:
+    build: .
+    ports:
+      - "1011:8080"
+    volumes:
+      - ./local-docker-logs:/app/Logs    # maps container logs → your machine's ./logs folder
+      # Format: [Path on Windows] : [Path inside Linux Container]
+      - ./appsettings.Development.json:/app/appsettings.Development.json:ro
+      - ./config.json:/app/wwwroot/config.json:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      #- ASPNETCORE_HTTP_PORTS=8090
+      #- DefaultTopRoleLevel=900
+      #- SystemUser__AllowWrite=false
+      #- Serilog__MinimumLevel__Default=Error
+      #- Serilog__MinimumLevel__Default__Override__Microsoft=Error
+      #- Serilog__MinimumLevel__Default__Override__System=Error
+      #- ConnectionStrings__DefaultConnection=Server=172.29.240.1,1435;Database=OrderService;User Id=sqlAdmin;Password=123456;TrustServerCertificate=True;

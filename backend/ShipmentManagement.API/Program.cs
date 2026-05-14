@@ -46,7 +46,7 @@ var app = builder.Build();
 // Auto-migrate and seed dummy data
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    /*var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     db.Database.Migrate();
 
     if (!db.Users.Any())
@@ -65,10 +65,10 @@ using (var scope = app.Services.CreateScope())
 
         db.Users.Add(adminUser);
         db.SaveChanges();
-    }
+    }*/
 }
 
-if (app.Environment.IsDevelopment())
+if (/*app.Environment.IsDevelopment()*/true)
 {
     app.MapOpenApi();
     /*app.MapScalarApiReference(options =>
@@ -81,9 +81,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
-
-//app.UseHttpsRedirection();
-
+// 1. Force HTTPS
+app.UseHttpsRedirection();
+// 2. Enable standard static file serving (for js, css, images)
+app.UseDefaultFiles(); // Looks for index.html
+app.UseStaticFiles();
 if (allowedOrigins.Any())
 {
     // IMPORTANT: CORS policy should be configured since frontend runs on different port (Vite)
@@ -93,5 +95,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
+// 3. THE KEY PART: Fallback to React
+// If the request doesn't match an API controller or a physical file, 
+// send index.html so React Router takes over.
+app.MapFallbackToFile("index.html");
 app.Run();
