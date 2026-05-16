@@ -11,3 +11,10 @@ export interface SearchUserRequest extends PagedRequest {
     email?: string
     isActive?: boolean
 }
+export interface CreateUserRequest {
+    email: string
+    password: string
+    firstName: string
+    lastName: string
+    isActive?: boolean
+}

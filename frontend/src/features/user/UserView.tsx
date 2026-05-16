@@ -1,18 +1,33 @@
 import { useState, useEffect } from 'react';
 import { HiOutlineEye, HiOutlinePencil } from 'react-icons/hi'
 import { HiOutlinePlus, HiOutlineSearch, HiOutlineTrash } from 'react-icons/hi'
-import type { UserDTO, SearchUserRequest } from '../../dto/user';
+import type { UserDTO, SearchUserRequest, CreateUserRequest } from '../../dto/user';
 import { Spinner } from '../../components/Spinner';
 import SortListHeader from '../../components/SortListHeader';
 import Badge from '../../components/Badge';
+import { PopupFormModal } from '../../components/PopupFormModal';
+import type { FormErrors } from './UserHook';
 interface UserViewProps {
     filterParam: SearchUserRequest,
     setFilterParam: (filterParam: SearchUserRequest) => void,
     handleSortData: (field: string, direction: string) => void
     data?: UserDTO[],
-    loading?: boolean
+    loading?: boolean,
+    formData: CreateUserRequest,
+    setFormData: (formData: CreateUserRequest) => void,
+    modalMode: string,
+    setModalMode: (modalMode: string) => void,
+    errors: FormErrors,
+    setErrors: (formErrors: FormErrors) => void,
+    handleFormSubmit: () => void,
+    handleOpenAddModal: () => void,
+    handleOpenEditModal: (id: string) => void,
+    selectedId: string | undefined,
+    setSelectedId: (id: string | undefined) => void
 }
-export default function UserView({ filterParam, setFilterParam, data, loading, handleSortData }: UserViewProps) {
+export default function UserView({ filterParam, setFilterParam, data, loading,
+    handleSortData, formData, setFormData, modalMode, setModalMode,
+    errors, setErrors, handleFormSubmit, handleOpenAddModal, handleOpenEditModal, selectedId, setSelectedId }: UserViewProps) {
     const [localFilter, setLocalFilter] = useState({
         email: filterParam.email,
         isActive: filterParam.isActive
@@ -38,7 +53,7 @@ export default function UserView({ filterParam, setFilterParam, data, loading, h
                 </div>
                 <button
                     onClick={() => {
-
+                        handleOpenAddModal();
                     }}
                     className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-md transition-colors"
                 >
@@ -175,7 +190,7 @@ export default function UserView({ filterParam, setFilterParam, data, loading, h
                                             <div className="flex items-center justify-center gap-1">
                                                 <button
                                                     onClick={() => {
-
+                                                        handleOpenEditModal(user.id);
                                                     }}
                                                     className="p-2 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
                                                     title="View details"
@@ -184,7 +199,7 @@ export default function UserView({ filterParam, setFilterParam, data, loading, h
                                                 </button>
                                                 <button
                                                     onClick={() => {
-
+                                                        handleOpenEditModal(user.id);
                                                     }}
                                                     className="p-2 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
                                                     title="Edit"
@@ -209,6 +224,90 @@ export default function UserView({ filterParam, setFilterParam, data, loading, h
                     </div>
                 )}
             </div>
+            {/* Create/Edit Modal */}
+            <PopupFormModal
+                title={modalMode === 'create' ? 'New User' : 'Edit User'}
+                isOpen={modalMode !== ''}
+                onClose={() => {
+                    setModalMode('')
+                }}
+                onSubmit={() => { handleFormSubmit() }}
+                isSubmitting={false}
+            >
+                <div className="flex flex-col gap-4">
+                    <div>
+                        <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-1.5">
+                            Email <span className="text-red-400">*</span>
+                        </label>
+                        <input
+                            id="email"
+                            type="text"
+                            value={formData.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            placeholder="Enter your email"
+                            className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+                        />
+                        {errors.email && (
+                            <p className="text-xs text-red-500 mt-1">{errors.email}</p>
+                        )}
+                    </div>
+                    <div>
+                        <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-1.5">
+                            Password <span className="text-red-400">*</span>
+                        </label>
+                        <input
+                            id="password"
+                            type="password"
+                            value={formData.password}
+                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                            placeholder="Enter your password"
+                            className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="firstName" className="block text-sm font-medium text-slate-300 mb-1.5">
+                            First Name <span className="text-red-400">*</span>
+                        </label>
+                        <input
+                            id="firstName"
+                            type="text"
+                            value={formData.firstName}
+                            onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                            placeholder="Enter your first name"
+                            className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="lastName" className="block text-sm font-medium text-slate-300 mb-1.5">
+                            Last Name <span className="text-red-400">*</span>
+                        </label>
+                        <input
+                            id="lastName"
+                            type="text"
+                            value={formData.lastName}
+                            onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                            placeholder="Enter your last name"
+                            className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+                        />
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                        <button
+                            id="user-isactive-toggle"
+                            type="button"
+                            onClick={() => setFormData({ ...formData, isActive: !formData.isActive })}
+                            className={`relative w-10 h-5 rounded-full transition-colors ${formData.isActive ? 'bg-indigo-600' : 'bg-slate-600'}`}
+                            role="switch"
+                            aria-checked={formData.isActive}
+                        >
+                            <span
+                                className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${formData.isActive ? 'translate-x-5' : ''}`}
+                            />
+                        </button>
+                        <span className="text-sm text-slate-600">Active</span>
+                    </div>
+                </div>
+            </PopupFormModal>
         </div>
     );
 }
