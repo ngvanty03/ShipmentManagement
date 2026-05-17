@@ -6,11 +6,15 @@ import { Spinner } from '../../components/Spinner';
 import SortListHeader from '../../components/SortListHeader';
 import Badge from '../../components/Badge';
 import { PopupFormModal } from '../../components/PopupFormModal';
+import { PaginationControl } from '../../components/PaginationControl';
 import type { FormErrors } from './UserHook';
+import { ConfirmModal } from '../../components/ConfirmModal';
 interface UserViewProps {
     filterParam: SearchUserRequest,
     setFilterParam: (filterParam: SearchUserRequest) => void,
-    handleSortData: (field: string, direction: string) => void
+    handleSortData: (field: string, direction: string) => void,
+    handlePageChange: (selectedItem: { selected: number }) => void,
+    totalPages: number,
     data?: UserDTO[],
     loading?: boolean,
     formData: CreateUserRequest,
@@ -18,20 +22,26 @@ interface UserViewProps {
     modalMode: string,
     setModalMode: (modalMode: string) => void,
     errors: FormErrors,
-    setErrors: (formErrors: FormErrors) => void,
     handleFormSubmit: () => void,
     handleOpenAddModal: () => void,
     handleOpenEditModal: (id: string) => void,
-    selectedId: string | undefined,
-    setSelectedId: (id: string | undefined) => void
+    handleDelete: (user: UserDTO) => void,
+    deleteTarget: UserDTO | null,
+    onDeleteConfirm: () => void,
+    onDeleteCancel: () => void
+    /*selectedId: string | undefined,
+    setSelectedId: (id: string | undefined) => void*/
 }
 export default function UserView({ filterParam, setFilterParam, data, loading,
-    handleSortData, formData, setFormData, modalMode, setModalMode,
-    errors, setErrors, handleFormSubmit, handleOpenAddModal, handleOpenEditModal, selectedId, setSelectedId }: UserViewProps) {
+    handleSortData, handlePageChange, totalPages, formData, setFormData, modalMode, setModalMode,
+    errors, handleFormSubmit, handleOpenAddModal, handleOpenEditModal, deleteTarget, handleDelete, onDeleteConfirm, onDeleteCancel /*, selectedId, setSelectedId */ }: UserViewProps) {
     const [localFilter, setLocalFilter] = useState({
         email: filterParam.email,
         isActive: filterParam.isActive
     });
+    //setErrors({});
+    // selectedId === undefined;
+    // setSelectedId(undefined);
 
     useEffect(() => {
         setLocalFilter({
@@ -130,97 +140,119 @@ export default function UserView({ filterParam, setFilterParam, data, loading,
                         </p>
                     </div>
                 ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm border-collapse">
-                            <thead>
-                                <tr className="bg-gray-300 ">
-                                    <th className="w-24 text-center px-5 py-3.5 font-semibold text-gray-600 border border-gray-300">
-                                        #
-                                    </th>
-                                    <SortListHeader
-                                        title="Email"
-                                        field="email"
-                                        sortBy={filterParam.sortBy || ''}
-                                        sortDirection={filterParam.sortDirection || 'asc'}
-                                        onSortChange={handleSortData}
-                                    />
-                                    <SortListHeader
-                                        title="firstName"
-                                        field="firstName"
-                                        sortBy={filterParam.sortBy || ''}
-                                        sortDirection={filterParam.sortDirection || 'asc'}
-                                        onSortChange={handleSortData}
-                                    />
-                                    <SortListHeader
-                                        title="Status"
-                                        field="isActive"
-                                        widthClassName='w-32'
-                                        sortBy={filterParam.sortBy || ''}
-                                        sortDirection={filterParam.sortDirection || 'asc'}
-                                        onSortChange={handleSortData}
-                                    />
-                                    <th className="text-center px-5 py-3.5 font-semibold text-gray-600 border border-gray-300 w-32">
-                                        Actions
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-300">
-                                {data?.map((user, idx) => (
-                                    <tr
-                                        key={user.id}
-                                        className="hover:bg-indigo-50/30 transition-colors group"
-                                    >
-                                        <td className="text-center px-5 py-4 text-gray-400 font-mono text-xs border border-gray-200">
-                                            {(idx + 1)}
-                                        </td>
-                                        <td className="px-5 py-4 border border-gray-200">
-                                            <p className="font-semibold text-gray-800 group-hover:text-indigo-700 transition-colors">
-                                                {user.email}
-                                            </p>
-                                        </td>
-                                        <td className="px-5 py-4 border border-gray-200">
-                                            <p className="font-semibold text-gray-800 group-hover:text-indigo-700 transition-colors">
-                                                {user.firstName} {user.lastName}
-                                            </p>
-                                        </td>
-                                        <td className="px-5 py-4 text-center hidden sm:table-cell border border-gray-200">
-                                            <Badge active={user.isActive} />
-                                        </td>
-                                        <td className="px-5 py-4 border border-gray-200">
-                                            <div className="flex items-center justify-center gap-1">
-                                                <button
-                                                    onClick={() => {
-                                                        handleOpenEditModal(user.id);
-                                                    }}
-                                                    className="p-2 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
-                                                    title="View details"
-                                                >
-                                                    <HiOutlineEye className="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => {
-                                                        handleOpenEditModal(user.id);
-                                                    }}
-                                                    className="p-2 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
-                                                    title="Edit"
-                                                >
-                                                    <HiOutlinePencil className="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => {
-
-                                                    }}
-                                                    className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                                                    title="Delete"
-                                                >
-                                                    <HiOutlineTrash className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        </td>
+                    <div className="flex flex-col">
+                        <div className="border-b border-gray-200">
+                            <PaginationControl
+                                totalPages={totalPages}
+                                pageNumber={filterParam.pageNumber}
+                                pageSize={filterParam.pageSize ?? 10}
+                                onPageChange={handlePageChange}
+                                onPageSizeChange={(newSize) => setFilterParam({ ...filterParam, pageSize: newSize, pageNumber: 1 })}
+                            />
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm border-collapse">
+                                <thead>
+                                    <tr className="bg-gray-300 ">
+                                        <th className="w-24 text-center px-5 py-3.5 font-semibold text-gray-600 border border-gray-300">
+                                            #
+                                        </th>
+                                        <SortListHeader
+                                            title="Email"
+                                            field="email"
+                                            sortBy={filterParam.sortBy || ''}
+                                            sortDirection={filterParam.sortDirection || 'asc'}
+                                            onSortChange={handleSortData}
+                                        />
+                                        <SortListHeader
+                                            title="firstName"
+                                            field="firstName"
+                                            sortBy={filterParam.sortBy || ''}
+                                            sortDirection={filterParam.sortDirection || 'asc'}
+                                            onSortChange={handleSortData}
+                                        />
+                                        <SortListHeader
+                                            title="Status"
+                                            field="isActive"
+                                            widthClassName='w-32'
+                                            sortBy={filterParam.sortBy || ''}
+                                            sortDirection={filterParam.sortDirection || 'asc'}
+                                            onSortChange={handleSortData}
+                                        />
+                                        <th className="text-center px-5 py-3.5 font-semibold text-gray-600 border border-gray-300 w-32">
+                                            Actions
+                                        </th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody className="divide-y divide-gray-300">
+                                    {data?.map((user, idx) => (
+                                        <tr
+                                            key={user.id}
+                                            className="hover:bg-indigo-50/30 transition-colors group"
+                                        >
+                                            <td className="text-center px-5 py-4 text-gray-400 font-mono text-xs border border-gray-200">
+                                                {(idx + 1)}
+                                            </td>
+                                            <td className="px-5 py-4 border border-gray-200">
+                                                <p className="font-semibold text-gray-800 group-hover:text-indigo-700 transition-colors">
+                                                    {user.email}
+                                                </p>
+                                            </td>
+                                            <td className="px-5 py-4 border border-gray-200">
+                                                <p className="font-semibold text-gray-800 group-hover:text-indigo-700 transition-colors">
+                                                    {user.firstName} {user.lastName}
+                                                </p>
+                                            </td>
+                                            <td className="px-5 py-4 text-center hidden sm:table-cell border border-gray-200">
+                                                <Badge active={user.isActive} />
+                                            </td>
+                                            <td className="px-5 py-4 border border-gray-200">
+                                                <div className="flex items-center justify-center gap-1">
+                                                    <button
+                                                        onClick={() => {
+                                                            handleOpenEditModal(user.id);
+                                                        }}
+                                                        className="p-2 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+                                                        title="View details"
+                                                    >
+                                                        <HiOutlineEye className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            handleOpenEditModal(user.id);
+                                                        }}
+                                                        className="p-2 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
+                                                        title="Edit"
+                                                    >
+                                                        <HiOutlinePencil className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            handleDelete(user)
+                                                        }}
+                                                        className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                                                        title="Delete"
+                                                    >
+                                                        <HiOutlineTrash className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Bottom Pagination */}
+                        <div className="border-t border-gray-200">
+                            <PaginationControl
+                                totalPages={totalPages}
+                                pageNumber={filterParam.pageNumber}
+                                pageSize={filterParam.pageSize ?? 10}
+                                onPageChange={handlePageChange}
+                                onPageSizeChange={(newSize) => setFilterParam({ ...filterParam, pageSize: newSize, pageNumber: 1 })}
+                            />
+                        </div>
                     </div>
                 )}
             </div>
@@ -251,19 +283,21 @@ export default function UserView({ filterParam, setFilterParam, data, loading,
                             <p className="text-xs text-red-500 mt-1">{errors.email}</p>
                         )}
                     </div>
-                    <div>
-                        <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-1.5">
-                            Password <span className="text-red-400">*</span>
-                        </label>
-                        <input
-                            id="password"
-                            type="password"
-                            value={formData.password}
-                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                            placeholder="Enter your password"
-                            className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
-                        />
-                    </div>
+                    {modalMode === 'create' && (
+                        <div>
+                            <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-1.5">
+                                Password <span className="text-red-400">*</span>
+                            </label>
+                            <input
+                                id="password"
+                                type="password"
+                                value={formData.password}
+                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                placeholder="Enter your password"
+                                className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+                            />
+                        </div>
+                    )}
                     <div>
                         <label htmlFor="firstName" className="block text-sm font-medium text-slate-300 mb-1.5">
                             First Name <span className="text-red-400">*</span>
@@ -308,6 +342,16 @@ export default function UserView({ filterParam, setFilterParam, data, loading,
                     </div>
                 </div>
             </PopupFormModal>
+            {/* Delete Confirm */}
+            <ConfirmModal
+                isOpen={!!deleteTarget}
+                title="Delete User"
+                message={`Are you sure you want to delete "${deleteTarget?.firstName} ${deleteTarget?.lastName}"? This action cannot be undone.`}
+                confirmLabel='Delete'
+                isLoading={false}
+                onConfirm={onDeleteConfirm}
+                onCancel={onDeleteCancel}
+            />
         </div>
     );
 }

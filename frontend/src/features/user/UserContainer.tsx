@@ -2,10 +2,11 @@ import { useUser } from './UserHook'
 import UserView from './UserView';
 
 export default function UserContainer() {
-    const { loading, users, filterParam, setParams, handleSortData,
+    const { loading, users, filterParam, setParams, handleSortData, handlePageChange, totalPages,
         formData, setFormData, modalMode, setModalMode,
-        errors, setErrors, handleFormSubmit,
-        handleOpenAddModal, handleOpenEditModal, selectedId, setSelectedId
+        errors, handleFormSubmit,
+        handleOpenAddModal, handleOpenEditModal,
+        deleteTarget, handleDelete, onDeleteConfirm, onDeleteCancel
     } = useUser();
     return (
         <UserView
@@ -14,17 +15,23 @@ export default function UserContainer() {
             filterParam={filterParam}
             setFilterParam={setParams}
             handleSortData={handleSortData}
+            handlePageChange={handlePageChange}
+            totalPages={totalPages}
             formData={formData}
             setFormData={setFormData}
             modalMode={modalMode}
             setModalMode={setModalMode}
             errors={errors}
-            setErrors={setErrors}
+            //setErrors={setErrors}
             handleFormSubmit={handleFormSubmit}
             handleOpenAddModal={handleOpenAddModal}
             handleOpenEditModal={handleOpenEditModal}
-            selectedId={selectedId}
-            setSelectedId={setSelectedId}
+            deleteTarget={deleteTarget}
+            handleDelete={handleDelete}
+            onDeleteConfirm={onDeleteConfirm}
+            onDeleteCancel={onDeleteCancel}
+        //selectedId={selectedId}
+        //setSelectedId={setSelectedId}
         />
     )
 }

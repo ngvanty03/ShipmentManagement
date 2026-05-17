@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { userApi } from "../../api/userApi";
-import { useQuery } from '@tanstack/react-query';
-import type { SearchUserRequest, CreateUserRequest } from "../../dto/user";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { SearchUserRequest, CreateUserRequest, UpdateUserRequest, UserDTO } from "../../dto/user";
+import toast from 'react-hot-toast'
 export interface FormErrors {
     email?: string,
     password?: string,
@@ -9,11 +10,12 @@ export interface FormErrors {
     lastName?: string,
 }
 export function useUser() {
+    const queryClient = useQueryClient()
     const [errors, setErrors] = useState<FormErrors>({});
     const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
     const [params, setParams] = useState<SearchUserRequest>({
         pageNumber: 1,
-        pageSize: 10,
+        pageSize: 5,
         isActive: true,
         email: "",
         sortDirection: "asc",
@@ -31,6 +33,46 @@ export function useUser() {
         queryKey: ['users', params],
         queryFn: () => userApi.searchUser(params),
     })
+    const userEditQuery = useQuery({
+        queryKey: ['users', selectedId],
+        queryFn: () => userApi.getUserById(selectedId ?? ""),
+        enabled: !!selectedId
+    })
+    const createMutation = useMutation({
+        mutationFn: (user: CreateUserRequest) => userApi.create(user),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['users'] })
+            setModalMode('');
+            setSelectedId(undefined);
+            toast.success("User created successfully")
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data.errors || {});
+        }
+    })
+    const updateMutation = useMutation({
+        mutationFn: ({ id, user }: { id: string, user: UpdateUserRequest }) => userApi.update(id, user),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['users'] })
+            setModalMode('');
+            setSelectedId(undefined);
+            toast.success("User updated successfully")
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data.errors || {});
+        }
+    })
+    useEffect(() => {
+        if (modalMode === 'edit' && userEditQuery.data) {
+            setFormData({
+                email: userEditQuery.data.email || '',
+                password: '', // We don't fetch or display the existing password
+                firstName: userEditQuery.data.firstName || '',
+                lastName: userEditQuery.data.lastName || '',
+                isActive: userEditQuery.data.isActive ?? true
+            });
+        }
+    }, [userEditQuery.data, modalMode]);
     const handleSortData = (field: string, direction: string) => {
         setParams({
             ...params,
@@ -40,7 +82,7 @@ export function useUser() {
         })
     }
 
-    console.log(listQuery.data);
+    //console.log(listQuery.data);
     const handleOpenAddModal = () => {
         setSelectedId(undefined);
         setModalMode('create');
@@ -57,11 +99,11 @@ export function useUser() {
         setSelectedId(id);
         setModalMode('edit');
         setFormData({
-            email: 'ngvanty03@gmail.com',
-            password: '1233',
-            firstName: 'Ty',
-            lastName: 'Nguyen',
-            isActive: false
+            email: '',
+            password: '',
+            firstName: '',
+            lastName: '',
+            isActive: true
         });
         setErrors({});
     }
@@ -78,7 +120,7 @@ export function useUser() {
             setErrors(validateErrors);
             return;
         }
-        if (!formData.password || formData.password.trim() === "") {
+        if (modalMode === 'create' && (!formData.password || formData.password.trim() === "")) {
             validateErrors.password = "Password is required";
             setErrors(validateErrors);
             return;
@@ -95,26 +137,79 @@ export function useUser() {
         }
         if (Object.keys(validateErrors).length === 0) {
             // Call API
+            if (modalMode === 'create') {
+                const data: CreateUserRequest = {
+                    email: formData.email,
+                    password: formData.password,
+                    firstName: formData.firstName,
+                    lastName: formData.lastName,
+                    isActive: formData.isActive
+                }
+                createMutation.mutate(data);
+            } else {
+                const updatedData: UpdateUserRequest = {
+                    email: formData.email,
+                    firstName: formData.firstName,
+                    lastName: formData.lastName,
+                    isActive: formData.isActive
+                }
+                updateMutation.mutate({ id: selectedId ?? "", user: updatedData });
+            }
         } else {
             setErrors(validateErrors);
         }
     }
+    const [deleteTarget, setDeleteTarget] = useState<UserDTO | null>(null)
+    const deleteMutation = useMutation({
+        mutationFn: (id: string) => userApi.delete(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['users'] })
+            setDeleteTarget(null)
+            toast.success("User deleted successfully")
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data.errors || {});
+        }
+    })
+    const handleDelete = (user: UserDTO) => {
+        setDeleteTarget(user)
+    }
+    const onDeleteConfirm = () => {
+        if (deleteTarget) {
+            deleteMutation.mutate(deleteTarget.id)
+        }
+    }
+    const onDeleteCancel = () => {
+        setDeleteTarget(null)
+    }
+    const handlePageChange = (selectedItem: { selected: number }) => {
+        setParams({
+            ...params,
+            pageNumber: selectedItem.selected + 1
+        });
+    }
+
     return {
         filterParam: params,
         setParams,
         users: listQuery.data?.items ?? [],
+        totalPages: listQuery.data?.totalPages ?? 0,
         loading: listQuery.isLoading,
         handleSortData,
+        handlePageChange,
         formData,
         setFormData,
         modalMode,
         setModalMode,
         errors,
-        setErrors,
         handleFormSubmit,
         handleOpenAddModal,
         handleOpenEditModal,
-        selectedId,
-        setSelectedId
+        deleteTarget,
+        handleDelete,
+        onDeleteConfirm,
+        onDeleteCancel
+        /*selectedId,
+        setSelectedId*/
     }
 }

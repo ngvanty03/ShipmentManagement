@@ -1,26 +1,28 @@
 import axiosInstance from "./axiosInstance";
-import type { UserDTO, SearchUserRequest } from "../dto/user";
+import type { UserDTO, SearchUserRequest, CreateUserRequest, UpdateUserRequest } from "../dto/user";
 import type { PagedResult } from "../types/PagedResult";
 
 export const userApi = {
     searchUser: async (request: SearchUserRequest) => {
-        var result = await axiosInstance.get<PagedResult<UserDTO>>('/users', { params: request });
+        //const queryString = new URLSearchParams(request as Record<string, string>).toString();
+        console.log("Call search user API");
+        var result = await axiosInstance.get<PagedResult<UserDTO>>('/Users', { params: request });
         return result.data;
     },
     getUserById: async (id: string) => {
-        var result = await axiosInstance.get(`/users/${id}`);
+        var result = await axiosInstance.get<UserDTO>(`/Users/${id}`);
         return result.data;
     },
-    create: async (user: UserDTO) => {
-        var result = await axiosInstance.post('/users', user);
+    create: async (user: CreateUserRequest) => {
+        var result = await axiosInstance.post<UserDTO>('/Users', user);
         return result.data;
     },
-    update: async (user: UserDTO) => {
-        var result = await axiosInstance.put(`/users/${user.id}`, user);
+    update: async (id: string, user: UpdateUserRequest) => {
+        var result = await axiosInstance.put<UserDTO>(`/Users/${id}`, user);
         return result.data;
     },
     delete: async (id: string) => {
-        var result = await axiosInstance.delete(`/users/${id}`);
+        var result = await axiosInstance.delete(`/Users/${id}`);
         return result.data;
     }
 }
