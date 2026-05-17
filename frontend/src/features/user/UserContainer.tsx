@@ -1,13 +1,13 @@
-import { useUser } from './UserHook'
 import UserView from './UserView';
+import { useUserList } from './hooks/useUserList';
+import { useUserForm } from './hooks/useUserForm';
+import { useUserDelete } from './hooks/useUserDelete';
 
 export default function UserContainer() {
-    const { loading, users, filterParam, setParams, handleSortData, handlePageChange, totalPages,
-        formData, setFormData, modalMode, setModalMode,
-        errors, handleFormSubmit,
-        handleOpenAddModal, handleOpenEditModal,
-        deleteTarget, handleDelete, onDeleteConfirm, onDeleteCancel
-    } = useUser();
+    const { loading, users, filterParam, setParams, handleSortData, handlePageChange, totalPages } = useUserList();
+    const { formData, setFormData, modalMode, setModalMode, errors, handleFormSubmit, handleOpenAddModal, handleOpenEditModal } = useUserForm();
+    const { deleteTarget, handleDelete, onDeleteConfirm, onDeleteCancel } = useUserDelete();
+
     return (
         <UserView
             data={users}

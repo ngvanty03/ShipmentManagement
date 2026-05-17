@@ -7,7 +7,7 @@ import SortListHeader from '../../components/SortListHeader';
 import Badge from '../../components/Badge';
 import { PopupFormModal } from '../../components/PopupFormModal';
 import { PaginationControl } from '../../components/PaginationControl';
-import type { FormErrors } from './UserHook';
+import type { FormErrors } from './hooks/useUserForm';
 import { ConfirmModal } from '../../components/ConfirmModal';
 interface UserViewProps {
     filterParam: SearchUserRequest,
