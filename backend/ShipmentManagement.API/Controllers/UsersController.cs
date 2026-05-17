@@ -8,6 +8,7 @@ using ShipmentManagement.Application.Commands.User.UpdateUser;
 using ShipmentManagement.Application.DTOs.Common;
 using ShipmentManagement.Application.DTOs.User;
 using ShipmentManagement.Application.Queries.User.GetUsers;
+using ShipmentManagement.Application.Queries.User.GetUsersById;
 
 namespace ShipmentManagement.API.Controllers;
 
@@ -29,7 +30,14 @@ public class UsersController : ControllerBase
         var result = await _mediator.Send(query);
         return Ok(result);
     }
-
+    [HttpGet("{id:guid}")]
+    [Authorize]
+    public async Task<ActionResult<UserDTO>> GetUserById(Guid id)
+    {
+        GetUsersByIdQuery query = new GetUsersByIdQuery() { Id=id.ToString() };
+        var result = await _mediator.Send(query);
+        return Ok(result);
+    }
     [HttpPost]
     [Authorize]
     public async Task<ActionResult<UserDTO>> CreateUser(CreateUserRequest request)
