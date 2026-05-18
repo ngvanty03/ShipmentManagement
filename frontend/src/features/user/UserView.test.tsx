@@ -232,6 +232,26 @@ describe('User Feature Integration', () => {
             vi.mocked(useUserForm).mockReturnValue({
                 ...defaultUseUserForm,
                 modalMode: 'edit',
+                isSubmitting: true,
+                isLoading: false,
+                formData: {
+                    email: 'ngvanty03@gmail.com',
+                    password: '[PASSWORD]',
+                    firstName: 'Ty',
+                    lastName: 'Nguyen',
+                    isActive: false,
+                },
+            });
+
+            render(<UserContainer />);
+            //check form control
+            expect(screen.getByTestId('modal-submit-btn')).toBeDisabled();
+            expect(screen.getByTestId('modal-submit-btn')).toHaveTextContent('Saving…');
+        });
+        it('should show spinner when isLoading is true', async () => {
+            vi.mocked(useUserForm).mockReturnValue({
+                ...defaultUseUserForm,
+                modalMode: 'edit',
                 isSubmitting: false,
                 isLoading: true,
                 formData: {
@@ -246,7 +266,7 @@ describe('User Feature Integration', () => {
             render(<UserContainer />);
             //check form control
             expect(screen.getByTestId('modal-submit-btn')).toBeDisabled();
-            expect(screen.getByTestId('modal-submit-btn')).toHaveTextContent('Save1');
+            expect(screen.getByTestId('modal-submit-btn')).toHaveTextContent('Loading…');
         });
     });
 });

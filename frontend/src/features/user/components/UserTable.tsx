@@ -85,6 +85,7 @@ export function UserTable({
                                         <HiOutlineEye className="w-4 h-4" />
                                     </button>
                                     <button
+                                        data-testid={`btn-edit-${user.id}`}
                                         onClick={() => handleOpenEditModal(user.id)}
                                         className="p-2 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
                                         title="Edit"
