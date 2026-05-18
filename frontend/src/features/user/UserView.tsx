@@ -29,6 +29,8 @@ interface UserViewProps {
     deleteTarget: UserDTO | null;
     onDeleteConfirm: () => void;
     onDeleteCancel: () => void;
+    isSubmitting: boolean;
+    isLoadingDetail: boolean;
 }
 
 export default function UserView({
@@ -36,7 +38,7 @@ export default function UserView({
     handleSortData, handlePageChange, totalPages,
     formData, setFormData, modalMode, setModalMode,
     errors, handleFormSubmit, handleOpenAddModal, handleOpenEditModal,
-    deleteTarget, handleDelete, onDeleteConfirm, onDeleteCancel
+    deleteTarget, handleDelete, onDeleteConfirm, onDeleteCancel, isSubmitting, isLoadingDetail
 }: UserViewProps) {
     return (
         <div>
@@ -114,6 +116,8 @@ export default function UserView({
                 errors={errors}
                 onClose={() => setModalMode('')}
                 onSubmit={handleFormSubmit}
+                isSubmitting={isSubmitting}
+                isLoading={isLoadingDetail}
             />
 
             <ConfirmModal

@@ -9,6 +9,8 @@ interface UserFormModalProps {
     errors: FormErrors;
     onClose: () => void;
     onSubmit: () => void;
+    isSubmitting: boolean;
+    isLoading: boolean;
 }
 
 export function UserFormModal({
@@ -17,7 +19,9 @@ export function UserFormModal({
     setFormData,
     errors,
     onClose,
-    onSubmit
+    onSubmit,
+    isSubmitting,
+    isLoading
 }: UserFormModalProps) {
     if (modalMode === '') return null;
 
@@ -27,7 +31,8 @@ export function UserFormModal({
             isOpen={modalMode !== ''}
             onClose={onClose}
             onSubmit={onSubmit}
-            isSubmitting={false}
+            isSubmitting={isSubmitting}
+            isLoading={isLoading}
         >
             <div className="flex flex-col gap-4">
                 <div>

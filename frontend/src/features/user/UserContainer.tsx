@@ -5,7 +5,8 @@ import { useUserDelete } from './hooks/useUserDelete';
 
 export default function UserContainer() {
     const { loading, users, filterParam, setParams, handleSortData, handlePageChange, totalPages } = useUserList();
-    const { formData, setFormData, modalMode, setModalMode, errors, handleFormSubmit, handleOpenAddModal, handleOpenEditModal } = useUserForm();
+    const { formData, setFormData, modalMode, setModalMode, errors, handleFormSubmit,
+        handleOpenAddModal, handleOpenEditModal, isSubmitting, isLoading: isLoadingDetail } = useUserForm();
     const { deleteTarget, handleDelete, onDeleteConfirm, onDeleteCancel } = useUserDelete();
 
     return (
@@ -30,8 +31,10 @@ export default function UserContainer() {
             handleDelete={handleDelete}
             onDeleteConfirm={onDeleteConfirm}
             onDeleteCancel={onDeleteCancel}
-        //selectedId={selectedId}
-        //setSelectedId={setSelectedId}
+            //selectedId={selectedId}
+            //setSelectedId={setSelectedId}
+            isSubmitting={isSubmitting}
+            isLoadingDetail={isLoadingDetail}
         />
     )
 }

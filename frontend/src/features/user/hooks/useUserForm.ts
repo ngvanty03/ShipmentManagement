@@ -97,7 +97,7 @@ export function useUserForm() {
     const handleFormSubmit = () => {
         const validateErrors: FormErrors = {};
         setErrors(validateErrors);
-        
+
         if (!formData.email || formData.email.trim() === "") {
             validateErrors.email = "Email is required";
             setErrors(validateErrors);
@@ -123,7 +123,7 @@ export function useUserForm() {
             setErrors(validateErrors);
             return;
         }
-        
+
         if (Object.keys(validateErrors).length === 0) {
             if (modalMode === 'create') {
                 createMutation.mutate(formData);
@@ -150,5 +150,7 @@ export function useUserForm() {
         handleFormSubmit,
         handleOpenAddModal,
         handleOpenEditModal,
+        isLoading: userEditQuery.isFetching,
+        isSubmitting: createMutation.isPending || updateMutation.isPending
     };
 }
