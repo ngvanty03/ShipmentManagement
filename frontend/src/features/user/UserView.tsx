@@ -46,7 +46,7 @@ export default function UserView({
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
                 </div>
-                <button
+                <button data-testid="btn-add-user"
                     onClick={handleOpenAddModal}
                     className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-md transition-colors"
                 >

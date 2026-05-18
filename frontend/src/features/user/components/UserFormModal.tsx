@@ -41,6 +41,7 @@ export function UserFormModal({
                     </label>
                     <input
                         id="email"
+                        data-testid="user-form-email"
                         type="text"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -58,6 +59,7 @@ export function UserFormModal({
                         </label>
                         <input
                             id="password"
+                            data-testid="user-form-password"
                             type="password"
                             value={formData.password}
                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -75,6 +77,7 @@ export function UserFormModal({
                     </label>
                     <input
                         id="firstName"
+                        data-testid="user-form-first-name"
                         type="text"
                         value={formData.firstName}
                         onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
@@ -91,6 +94,7 @@ export function UserFormModal({
                     </label>
                     <input
                         id="lastName"
+                        data-testid="user-form-last-name"
                         type="text"
                         value={formData.lastName}
                         onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
@@ -105,6 +109,7 @@ export function UserFormModal({
                 <div className="flex items-center gap-3">
                     <button
                         id="user-isactive-toggle"
+                        data-testid="user-form-is-active"
                         type="button"
                         onClick={() => setFormData({ ...formData, isActive: !formData.isActive })}
                         className={`relative w-10 h-5 rounded-full transition-colors ${formData.isActive ? 'bg-indigo-600' : 'bg-slate-600'}`}

@@ -48,7 +48,7 @@ export const MainLayout: React.FC = () => {
           <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow">
             SH
           </div>
-          <span className="font-semibold text-slate-800 text-sm hidden sm:block">ShipHub</span>
+          <span className="font-semibold text-slate-800 text-sm hidden sm:block">ShipHub-20260518.01</span>
         </Link>
 
         {/* Nav */}
